@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MaxSize 10
+int visited[MaxSize]={0};
+typedef struct EdgeNode
+{
+    int adjvex;
+    struct EdgeNode *next;
+} EdgeNode;
+typedef char DataType;
+typedef struct
+{
+    DataType vertex;
+    EdgeNode *first;
+} VertexNode;
+
+typedef struct
+{
+    VertexNode adjlist[MaxSize];
+    int vertexNum, edgeNum;
+} ALGraph;
+
+void CreatGraph(ALGraph *G,DataType a[],int n,int e){
+    int i,j,k;
+    EdgeNode *s=NULL;
+    G->vertexNum=n;
+    G->edgeNum=e;
+    for(i=0;i<G->vertexNum;i++){
+        G->adjlist[i].vertex=a[i];
+        G->adjlist[i].first=NULL;
+    }
+    for(k=0;k<G->edgeNum;k++){
+        printf("输入顶点编号：");
+        scanf("%d%d",&i,&j);
+        s=(EdgeNode *)malloc(sizeof(EdgeNode));
+        s->adjvex=j;
+        s->next=G->adjlist[i].first;
+        G->adjlist[i].first=s;
+    }
+}
+
+void DestroyGraph(ALGraph *G){
+    EdgeNode *p = NULL,*q = NULL;
+    for (int i=0; i<G->vertexNum; i++) {
+        p=q=G->adjlist[i].first;
+        while (p!=NULL) {
+            p=p->next;
+            free(q);
+            q=p;
+        }
+    }
+}
+void DFTraverse(ALGraph *G,int v)
+{
+    int i,j,S[MaxSize],flag=0;
+    int top = -1;
+    EdgeNode *p = NULL;
+    printf("%c ", G->adjlist[v].vertex);
+    visited[v] = 1;
+    p = G->adjlist[v].first;
+    S[++top]=v;
+    while(top!=-1){
+        i=S[top];
+        while (p != NULL)
+        {
+            j = p->adjvex;
+            if (visited[j] == 0)
+            {
+                printf("%c ", G->adjlist[j].vertex);
+                visited[j] = 1;
+                p = G->adjlist[j].first;
+                S[++top]=j;
+                flag=1;
+                break;
+            }
+            p = p->next;
+        }
+        if(p==NULL)
+            top--;
+    }
+}
+int main(int argc, const char * argv[]){
+    ALGraph G;
+    char a[]={'a','b','c','d','e'};
+    int n=5,e=6;
+    CreatGraph(&G,a,n,e);
+    printf("顶点%c出发的深度优先遍历序列是：",a[0]);
+    DFTraverse(&G,0);
+    printf("\n");
+    DestroyGraph(&G);
+    return 0;
+}
