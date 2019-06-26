@@ -1,0 +1,104 @@
+#include <stdio.h>
+#define MaxSize 10
+int visited[MaxSize]={0};
+
+typedef char DataType;
+typedef struct
+{
+    DataType vertex[MaxSize];
+    int edge[MaxSize][MaxSize];
+    int vertexNum,edgeNum;
+}MGraph;
+
+void CreatGraph(MGraph *G,DataType a[],int n,int e)
+{
+    int i,j;
+    G->vertexNum = n;
+    G->edgeNum = e;
+    for(int i=0;i<G->vertexNum;i++){
+        G->vertex[i]=a[i];
+    }
+    for(int i=0;i<G->vertexNum;i++){
+        for(int j=0;j<G->edgeNum;j++){
+            G->edge[i][j]=0;
+        }
+    }
+    for(int k=0;k<G->edgeNum;k++){
+        printf("输入边依附的顶点编号：");
+        scanf("%d%d",&i,&j);
+        G->edge[i][j]=1;
+        G->edge[j][i]=1;
+    }
+    for(int i=0;i<G->vertexNum;i++){
+        for(int j=0;j<G->edgeNum;j++){
+            printf("%d ",G->edge[i][j]);
+        }
+        printf("\n");
+    }
+}
+//递归算法深度优先遍历
+//void DFTraverse(MGraph *G,int v)
+//{
+//    printf("%c ", G->vertex[v]);
+//    visited[v] = 1;
+//    for (int j = 0; j < G->vertexNum; j++)
+//        if (G->edge[v][j] == 1 && visited[j] == 0)
+//            DFTraverse(G, j);
+//}
+//非递归算法深度优先遍历
+void DFTraverse(MGraph *G,int v)
+{
+    int i,S[MaxSize],flag=0;
+    int top = -1;
+    printf("%c ", G->vertex[v]);
+    visited[v] = 1;
+    S[++top]=v;
+    while(top!=-1){
+        i=S[top];
+        for (int j = 0; j < G->vertexNum; j++){
+            if (G->edge[i][j] == 1 && visited[j] == 0){
+                printf("%c ", G->vertex[j]);
+                visited[j] = 1;
+                S[++top]=j;
+                flag=1;
+                break;
+            }
+        }
+        if(flag==0)
+            top--;
+    }
+}
+
+void BFTraverse(MGraph *G,int v){
+    int i,Q[MaxSize];
+    int front =-1;
+    int rear =-1;
+    printf("%c",G->vertex[v]);
+    visited[v] = 1;
+    Q[++rear]=v;
+    while(front!=rear){
+        i=Q[++front];
+        for (int j = 0; j < G->vertexNum; j++){
+            if (G->edge[i][j] == 1 && visited[j] == 0){
+                printf("%c",G->vertex[j]);
+                visited[j] = 1;
+                Q[++rear]=j;
+            }
+        }
+    }
+}
+
+int main()
+{
+    MGraph G;
+    DataType a[]={'a','b','c','d'};
+    int n=4,e=4;
+    CreatGraph(&G,a,n,e);
+    printf("顶点%c出发的深度优先遍历序列是：",a[1]);
+    DFTraverse(&G,1);
+    printf("\n");
+//    printf("顶点%c出发的广度优先遍历序列是：",a[0]);
+//    BFTraverse(&G,1);
+//    printf("\n");
+    return 0;
+}
