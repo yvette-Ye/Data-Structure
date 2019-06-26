@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MaxSize 100
+int count=0;
+typedef char DataType;
+typedef struct BiNode{
+    DataType data;
+    struct BiNode *lchild,*rchild;
+}BiNode;
+
+BiNode * CreatBiTree(BiNode *root)
+{
+    char ch;
+    scanf("%c",&ch);
+    if (ch == '#') root = NULL;
+    else {
+        root = (BiNode *)malloc(sizeof(BiNode));
+        root->data = ch;
+        root->lchild = CreatBiTree(root->lchild);
+        root->rchild = CreatBiTree(root->rchild);
+    }
+    return root;
+}
+
+void DestroyBiTree(BiNode *root){
+    if(root == NULL) return;
+    else {
+        DestroyBiTree(root->lchild);
+        DestroyBiTree(root->rchild);
+        free(root);
+    }
+}
+
+void Count(BiNode *root){
+    if (root == NULL) return;
+    else {
+        if (!root->lchild && !root->rchild)
+            count ++;
+            Count(root->lchild);
+            Count(root->rchild);
+    }
+}
+
+void PreOrder(BiNode *root)
+{
+    if (root == NULL) return;
+    else {
+        if (!root->lchild && !root->rchild)
+            printf("%c ",root->data);
+            PreOrder(root->lchild);
+            PreOrder(root->rchild);
+    }
+}
+
+int main()
+{
+    BiNode *root=NULL;
+    root=CreatBiTree(root);
+    printf("该树的根节点是：%c\n",root->data);
+    Count(root);
+    printf("该树的叶节点的个数是：%d\n",count);
+    printf("该树的叶节点是：");
+    PreOrder(root);
+    printf("\n");
+    DestroyBiTree(root);
+    return 0;
+}
