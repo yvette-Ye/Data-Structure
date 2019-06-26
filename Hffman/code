@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define maxSize 100
+
+typedef struct{
+    unsigned int weight;
+    unsigned int parent;
+    unsigned int lChild;
+    unsigned int rChild;
+} Node, *HuffmanTree;
+char C[100];
+typedef char *HuffmanCode;
+
+//选取两个权值最小的结点s1,s2
+void elect(HuffmanTree *huffmanTree, int n, int *s1, int *s2){
+    int i = 0;
+    int min = 0;
+    for(i = 1; i <= n; i++){
+        if((*huffmanTree)[i].parent == 0){
+            min = i;
+            break;
+        }
+    }
+    for(i = 1; i <= n; i++){
+        if((*huffmanTree)[i].parent == 0){
+            if((*huffmanTree)[i].weight < (*huffmanTree)[min].weight){
+                min = i;
+            }
+        }
+    }
+    *s1 = min;
+    for(i = 1; i <= n; i++){
+        if((*huffmanTree)[i].parent == 0 && i != (*s1)){
+            min = i;
+            break;
+        }
+    }
+    for(i = 1; i <= n; i++){
+        if((*huffmanTree)[i].parent == 0 && i != (*s1)){
+            if((*huffmanTree)[i].weight < (*huffmanTree)[min].weight){
+                min = i;
+            }
+        }
+    }
+    *s2 = min;
+}
+
+//创建哈夫曼树
+void createHuffmanTree(HuffmanTree *huffmanTree, int w[], int n){
+    int m = 2 * n - 1;
+    int s1,s2,i;
+    *huffmanTree = (HuffmanTree)malloc((m + 1) * sizeof(Node));
+    for(i = 1; i <= n; i++){
+        (*huffmanTree)[i].weight = w[i];
+        (*huffmanTree)[i].lChild = 0;
+        (*huffmanTree)[i].parent = 0;
+        (*huffmanTree)[i].rChild = 0;
+    }
+    for(i = n + 1; i <= m; i++){
+        (*huffmanTree)[i].weight = 0;
+        (*huffmanTree)[i].lChild = 0;
+        (*huffmanTree)[i].parent = 0;
+        (*huffmanTree)[i].rChild = 0;
+    }
+    
+    printf("HuffmanTree:\n");
+    for(i = n + 1; i <= m; i++){
+        elect(huffmanTree, i-1, &s1, &s2);
+        (*huffmanTree)[s1].parent = i;
+        (*huffmanTree)[s2].parent = i;
+        (*huffmanTree)[i].lChild = s1;
+        (*huffmanTree)[i].rChild = s2;
+        (*huffmanTree)[i].weight = (*huffmanTree)[s1].weight + (*huffmanTree)[s2].weight;
+        printf("%d (%d, %d)\n", (*huffmanTree)[i].weight, (*huffmanTree)[s1].weight, (*huffmanTree)[s2].weight);
+    }
+    printf("\n");
+}
+
+//逆向求每个叶子结点对应的哈夫曼编码
+void createHuffmanCode(HuffmanTree *huffmanTree, HuffmanCode *huffmanCode, int n){
+    int i,start,p;
+    unsigned int c;
+    huffmanCode=(HuffmanCode *)malloc((n+1) * sizeof(char *));
+    char *cd = (char *)malloc(n * sizeof(char));
+    cd[n-1] = '\0';
+    for(i = 1; i <= n; i++){
+        start = n - 1;
+        for(c = i, p = (*huffmanTree)[i].parent; p != 0; c = p, p = (*huffmanTree)[p].parent){
+            if( (*huffmanTree)[p].lChild == c){
+                cd[--start] = '0';
+            }
+            else{
+                cd[--start] = '1';
+            }
+        }
+        huffmanCode[i] = (char *)malloc((n - start) * sizeof(char));
+        strcpy(huffmanCode[i], &cd[start]);
+    }
+    free(cd);
+    for(i = 1; i <= n; i++){
+        printf("%c  %d 的哈夫曼编码是 %s\n", C[i],(*huffmanTree)[i].weight, huffmanCode[i]);
+    }
+    printf("\n");
+}
+
+int main(int argc, char *argv[]) {
+    HuffmanTree HT;
+    HuffmanCode HC;
+    int *w,i,n,weight;
+    char string[maxSize];
+    printf("任意输入字符串：" );
+    scanf("%s",string);
+    printf("n = " );
+    scanf("%d",&n);
+    for (i=1; i<=n; i++) {
+        C[i]=string[i-1];
+    }
+    w=(int *)malloc((n+1)*sizeof(int));
+    printf("输入这%d个元素的权值:\n",n);
+    for(i=1; i<=n; i++){
+        printf("%c: ",string[i-1]);
+        fflush(stdin);
+        scanf("%d",&weight);
+        w[i]=weight;
+    }
+    createHuffmanTree(&HT, w, n);
+    createHuffmanCode(&HT,&HC,n); 
+    return 0;
+}
